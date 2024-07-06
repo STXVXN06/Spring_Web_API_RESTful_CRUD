@@ -2,6 +2,7 @@ package com.steven.curso.springboot.app.springboot_crud.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,7 +19,8 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         return http.authorizeHttpRequests((authz) -> authz
-        .requestMatchers("api/users").permitAll() // la ruta /users queda publica
+        .requestMatchers(HttpMethod.GET, "api/users").permitAll() // la ruta api/users queda publica solo para metodos GET
+        .requestMatchers(HttpMethod.POST, "api/users/register").permitAll() // la ruta api/users/register queda publica solo en POST
         .anyRequest().authenticated()) // el resto de rutas necesitan autenticacion
         .csrf(config -> config.disable()) // deshabilitamos el token csrf para evitar vulnerabilidades, hack en formularios
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
