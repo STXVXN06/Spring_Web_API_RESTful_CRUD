@@ -1,9 +1,12 @@
 package com.steven.curso.springboot.app.springboot_crud.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.steven.curso.springboot.app.springboot_crud.validation.ExistsByUsername;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -28,16 +31,20 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @ExistsByUsername
     @Column(unique = true)
     @NotBlank
     @Size(min = 4, max = 12)
     private String username;
+
 
     @NotBlank
     // @JsonIgnore // Ignora para lectura y escritura
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // acceso solo de escritura
     private String password;
 
+    @JsonIgnoreProperties({"users", "handler", "hibernateLazyInitializer"})
     @ManyToMany
     @JoinTable(
         name = "users_roles", 
@@ -46,18 +53,25 @@ public class User {
         uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "role_id"})})
     private List<Role> roles;
 
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean enabled;
-    @PrePersist
-    public void prePersist() {
-        enabled = true;
-    }
-
-
+    
+    
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean admin;
 
+    
+    public User() {
+        roles = new ArrayList<>();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        enabled = true;
+    }
+    
     public Long getId() {
         return id;
     }
@@ -107,6 +121,37 @@ public class User {
     @Override
     public String toString() {
         return "{id=" + id + ", username=" + username + ", password=" + password + ", roles=" + roles + "}";
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((username == null) ? 0 : username.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        User other = (User) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (username == null) {
+            if (other.username != null)
+                return false;
+        } else if (!username.equals(other.username))
+            return false;
+        return true;
     }
 
 
