@@ -1,7 +1,9 @@
 package com.steven.curso.springboot.app.springboot_crud.entities;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -28,8 +30,13 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 
+
+    @ManyToMany(mappedBy = "roles")
+    private Set<Route> routes;
+
     public Role() {
         this.users = new ArrayList<>();
+        this.routes = new HashSet<>();
     }
 
     public Role(String name) {
